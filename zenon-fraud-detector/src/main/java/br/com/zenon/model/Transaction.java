@@ -11,5 +11,16 @@ public record Transaction(
         boolean isFraud,
         boolean isFlaggedFraud
 ) {
-
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "step=" + step +
+                ", type=" + type +
+                ", amount=" + amount +
+                ", origin=" + origin +
+                ", recipient=" + recipient +
+                ", isFraud=" + isFraud +
+                ", isFlaggedFraud=" + isFlaggedFraud +
+                '}';
+    }
 }
