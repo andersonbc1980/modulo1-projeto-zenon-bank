@@ -22,7 +22,7 @@ public class Main {
         System.out.println(transaction1);
         System.out.println(transaction2);
 
-        System.out.println();
+       /* System.out.println();
         System.out.println("---- Forma mais antiga de ler arquivo ----");
         System.out.println();
         TransactionIngestor transactionIngestor = new TransactionIngestor();
@@ -34,18 +34,28 @@ public class Main {
         System.out.println("---- Forma que eu fiz de ler arquivo ----");
         System.out.println();
         String fileName = IO.readln("Digite o nome do arquivo: ");
-        TransactionIngestor trasactionIngestor = new TransactionIngestor();
-        List<Transaction> transaction3 = trasactionIngestor.readMyWay(fileName);
+        //TransactionIngestor trasactionIngestor = new TransactionIngestor();
+        List<Transaction> transaction3 = transactionIngestor.readMyWay(fileName);
         for (int i = 0; i < 10; i++) {
             System.out.println(transaction3.get(i));
-        }
+        }*/
+
         System.out.println();
         System.out.println("---- Forma mais atual de ler arquivo ----");
         System.out.println();
-        TransactionIngestor transactionIngestor2 = new TransactionIngestor();
-        List<Transaction> transactions2 = transactionIngestor.read("data\\PS_20174392719_1491204439457_log.csv");
+        TransactionIngestor transactionIngestor = new TransactionIngestor();
+        List<Transaction> transactions = transactionIngestor.read("data\\PS_20174392719_1491204439457_log.csv");
 
         transactions.stream().limit(10).forEach(System.out::println);
+
+        System.out.println();
+        System.out.println("---- Arquivo bad dat ----");
+        System.out.println();
+
+        List<Transaction> transactions2 = transactionIngestor.read("data\\paysim_with_bad_data.csv");
+
+        transactions2.stream().forEach(System.out::println);
+
 
     }
 }

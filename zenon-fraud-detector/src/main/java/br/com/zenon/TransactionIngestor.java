@@ -9,13 +9,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class TransactionIngestor {
 
-    //Forma mais antiga de ler um arquivo
+    /*Forma mais antiga de ler um arquivo
     public List<Transaction> readOldForm(String fileName){
         List<Transaction> transactions = new ArrayList<>();
 
@@ -58,7 +56,7 @@ public class TransactionIngestor {
             list.add(transaction);
         }
         return list;
-    }
+    }*/
 
     //Forma mais atual de ler um arquivo
     public List<Transaction> read(String fileName){
@@ -69,6 +67,8 @@ public class TransactionIngestor {
                     .skip(1)
                     .limit(1000)
                     .map(this::parseTransaction)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .toList();
         } catch (Exception e){
             throw new RuntimeException("Erro ao ler o arquivo: " + fileName, e);
@@ -76,20 +76,26 @@ public class TransactionIngestor {
 
     }
 
-    private Transaction parseTransaction(String line) {
-        String[] linePart = line.split(",");
+    private Optional<Transaction> parseTransaction(String line) {
+        try {
+            String[] linePart = line.split(",");
 
-        int step = Integer.parseInt(linePart[0]);
-        TransactionType type = TransactionType.valueOf(linePart[1]);
-        BigDecimal amount = new BigDecimal(linePart[2]);
-        TransactionCustomer origin =
-                new TransactionCustomer(linePart[3], new BigDecimal(linePart[4]), new BigDecimal(linePart[5]));
-        TransactionCustomer recipient =
-                new TransactionCustomer(linePart[6], new BigDecimal(linePart[7]), new BigDecimal(linePart[8]));
-        boolean isFraud = linePart[9].equals("1");
-        boolean isFlaggedFraud = linePart[10].equals("1");
+            int step = Integer.parseInt(linePart[0]);
+            TransactionType type = TransactionType.valueOf(linePart[1]);
+            if (linePart[2] == null || linePart[2].trim().isEmpty())
+                throw new IllegalArgumentException("O valor de amount não pode ser nulo ou vazio!");
+            BigDecimal amount = new BigDecimal(linePart[2]);
+            TransactionCustomer origin =
+                    new TransactionCustomer(linePart[3], new BigDecimal(linePart[4]), new BigDecimal(linePart[5]));
+            TransactionCustomer recipient =
+                    new TransactionCustomer(linePart[6], new BigDecimal(linePart[7]), new BigDecimal(linePart[8]));
+            boolean isFraud = linePart[9].equals("1");
+            boolean isFlaggedFraud = linePart[10].equals("1");
 
-        return new Transaction(step, type, amount, origin, recipient, isFraud, isFlaggedFraud);
-
+            return Optional.of(new Transaction(step, type, amount, origin, recipient, isFraud, isFlaggedFraud));
+        } catch (Exception e){
+            System.err.println("Erro ao fazer parse: " + line + " | " + e);
+            return Optional.empty();
+        }
     }
 }
