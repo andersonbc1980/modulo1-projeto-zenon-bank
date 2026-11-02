@@ -3,6 +3,9 @@ package br.com.zenon;
 import br.com.zenon.model.Transaction;
 import br.com.zenon.model.TransactionCustomer;
 import br.com.zenon.model.TransactionType;
+import br.com.zenon.repository.TransactionListRepository;
+import br.com.zenon.repository.TransactionMapRepository;
+import br.com.zenon.repository.TransactionRepository;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -66,6 +69,31 @@ public class Main {
         Map<TransactionType, Long> fraudCountByType = fraudAnalyzer.countFraudsByType();
         System.out.println("Fraudes por tipo:");
         fraudCountByType.forEach((type, count)-> IO.println("- %s: %d".formatted(type, count)));
+
+        System.out.println("---------------------------------");
+        System.out.println();
+
+        TransactionRepository transactionRepository;
+        transactionRepository = new TransactionListRepository(transactions);
+        String notFoundOriginName = "C12345";
+        transactionRepository.findByOriginName(notFoundOriginName)
+                        .ifPresentOrElse(System.out::println, ()-> System.out.println("Transação não encontrada para " + notFoundOriginName));
+
+        String existingOriginName = "C1868032458";
+
+        long starTimeList = System.nanoTime();
+        transactionRepository.findByOriginName(existingOriginName)
+                .ifPresentOrElse(System.out::println, ()-> System.out.println("Transação não encontrada para " + existingOriginName));
+        long endTimeList = System.nanoTime();
+        System.out.println("Tempo de busca - List (ms): " + (endTimeList - starTimeList)/1_000_000.0);
+
+        transactionRepository = new TransactionMapRepository(transactions);
+        starTimeList = System.nanoTime();
+        transactionRepository.findByOriginName(existingOriginName)
+                .ifPresentOrElse(System.out::println, ()-> System.out.println("Transação não encontrada para " + existingOriginName));
+        endTimeList = System.nanoTime();
+        System.out.println("Tempo de busca - Map (ms): " + (endTimeList - starTimeList)/1_000_000.0);
+
 
         System.out.println();
         System.out.println("---- Arquivo bad dat ----");
