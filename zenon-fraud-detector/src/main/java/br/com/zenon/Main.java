@@ -7,6 +7,7 @@ import br.com.zenon.model.TransactionType;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
     static void main() throws IOException {
@@ -46,7 +47,25 @@ public class Main {
         TransactionIngestor transactionIngestor = new TransactionIngestor();
         List<Transaction> transactions = transactionIngestor.read("data\\PS_20174392719_1491204439457_log.csv");
 
-        transactions.stream().limit(10).forEach(System.out::println);
+        //transactions.stream().limit(10).forEach(System.out::println);
+        FraudAnalyzer fraudAnalyzer = new FraudAnalyzer(transactions);
+        long fraudCount = fraudAnalyzer.countFrauds();
+        System.out.println("Total de fraudes: " + fraudCount);
+
+        List<BigDecimal> highestFraudsAmounts = fraudAnalyzer.findHighestValueFraudAmounts(3);
+        System.out.println("Top 3 fraudes de maior valor");
+        highestFraudsAmounts.forEach((amount)-> IO.println("- %.2f".formatted(amount)));
+
+        List<String> suspiciousClientes = fraudAnalyzer.findSuspiciousClientes(5);
+        System.out.println("Top 5 clientes suspeitos");
+        suspiciousClientes.forEach(IO::println);
+
+        BigDecimal totalFraudLoss = fraudAnalyzer.calculateTotalFraudLoss();
+        System.out.println("Prejuízo total: " + totalFraudLoss);
+
+        Map<TransactionType, Long> fraudCountByType = fraudAnalyzer.countFraudsByType();
+        System.out.println("Fraudes por tipo:");
+        fraudCountByType.forEach((type, count)-> IO.println("- %s: %d".formatted(type, count)));
 
         System.out.println();
         System.out.println("---- Arquivo bad dat ----");
