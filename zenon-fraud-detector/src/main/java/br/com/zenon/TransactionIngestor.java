@@ -58,7 +58,7 @@ public class TransactionIngestor {
         return list;
     }*/
 
-    public static final int FRAUD_LIMIT = 100_000;
+    public static final int FRAUD_LIMIT = 10_000;
 
     //Forma mais atual de ler um arquivo
     public List<Transaction> read(String fileName){
